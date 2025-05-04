@@ -217,6 +217,29 @@ def get_results():
         'timestamp': report.timestamp.isoformat()
     } for report in reports]), 200
 
+@app.route('/results/<int:report_id>', methods=['DELETE'])
+@jwt_required()
+def delete_report(report_id):
+    user_id = get_jwt_identity()
+    report = Report.query.filter_by(id=report_id, user_id=user_id).first()
+    
+    if not report:
+        return jsonify({'error': 'Report not found or not authorized'}), 404
+    
+    # Delete associated file if it exists
+    try:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], report.filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception as e:
+        print(f"Error deleting file: {str(e)}")
+    
+    # Delete the report
+    db.session.delete(report)
+    db.session.commit()
+    
+    return jsonify({'message': 'Report deleted successfully'}), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
