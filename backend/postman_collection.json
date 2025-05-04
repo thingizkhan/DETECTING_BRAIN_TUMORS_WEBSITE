@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "MRI Report Analysis API",
+		"description": "Collection for testing the MRI Report Analysis API endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"123456\",\n    \"confirm_password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4000/auth/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4000/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["auth", "login"]
+						},
+						"event": [
+							{
+								"listen": "test",
+								"script": {
+									"exec": [
+										"var jsonData = pm.response.json();",
+										"pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+										"console.log(\"Token set: \" + pm.collectionVariables.get(\"access_token\"));"
+									],
+									"type": "text/javascript"
+								}
+							}
+						]
+					}
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:4000/auth/profile",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["auth", "profile"]
+						},
+						"event": [
+							{
+								"listen": "prerequest",
+								"script": {
+									"exec": [
+										"console.log(\"Current token: \" + pm.collectionVariables.get(\"access_token\"));"
+									],
+									"type": "text/javascript"
+								}
+							}
+						]
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.updated@example.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4000/auth/profile-update",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["auth", "profile-update"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"123456\",\n    \"new_password\": \"654321\",\n    \"confirm_password\": \"654321\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4000/auth/password",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["auth", "password"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Upload Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/your/file.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:4000/upload",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["upload"]
+						}
+					}
+				},
+				{
+					"name": "Get Results",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:4000/results",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "4000",
+							"path": ["results"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 
