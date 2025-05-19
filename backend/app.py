@@ -179,24 +179,47 @@ def change_password():
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
-    
+
     file = request.files['file']
-    
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    
-    if not allowed_file(file.filename):
-        return jsonify({'error': 'File type not allowed'}), 400
-    
+
     filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(file_path)
-    
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(save_path)
+
+    # Hasta klasörünü kaydedeceğimiz klasör
+    patient_id = filename.split('.')[0]
+    patient_folder = os.path.join(app.config['UPLOAD_FOLDER'], patient_id)
+    os.makedirs(patient_folder, exist_ok=True)
+
+    # Dosyayı .zip değilse klasör olarak açmamıza gerek yok (örneğin normal klasör gelirse direkt kullan)
+    if filename.endswith('.zip'):
+        import zipfile
+        with zipfile.ZipFile(save_path, 'r') as zip_ref:
+            zip_ref.extractall(patient_folder)
+        os.remove(save_path)
+
+    # Model tahmini al
+    from model_utils import predict_patient_folder
+    label, probability = predict_patient_folder(patient_folder)
+
+    # Sonucu CSV'ye yaz
+    import pandas as pd
+    result_df = pd.DataFrame([{
+        "filename": filename,
+        "label": label,
+        "probability": probability
+    }])
+    result_df.to_csv(os.path.join(patient_folder, "result.csv"), index=False)
+
+    # Veritabanına yaz
     user_id = get_jwt_identity()
-    report = Report(user_id=user_id, filename=filename)
+    result_str = f"Tespit Edilen: {'MGMT Mevcut' if label == 1 else 'MGMT Yok'} (Güven: {probability:.4f})"
+    report = Report(user_id=user_id, filename=filename, result=result_str)
     db.session.add(report)
     db.session.commit()
-    
+
     return jsonify({
         'id': report.id,
         'filename': filename,
