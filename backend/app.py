@@ -7,7 +7,7 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
-
+from model_utils import predict_patient_folder
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
