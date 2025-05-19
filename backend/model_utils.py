@@ -37,12 +37,14 @@ def load_multimodal_tensor(folder):
     return torch.tensor(stacked).unsqueeze(0).float()  # (1, 4, D, H, W)
 
 def augment(img):
-    if random.random() > 0.5:
-        img = torch.flip(img, dims=[3])
-    if random.random() > 0.5:
-        img = torch.flip(img, dims=[4])
-    if random.random() > 0.5:
-        img = TF.rotate(img, angle=random.choice([90, 180, 270]))
+    # Ensure img is in the correct shape [batch_size, channels, height, width]
+    if img.dim() == 4:  # If img is [batch_size, channels, height, width]
+        if random.random() > 0.5:
+            img = torch.flip(img, dims=[3])
+        if random.random() > 0.5:
+            img = torch.flip(img, dims=[4])
+        if random.random() > 0.5:
+            img = TF.rotate(img, angle=random.choice([90, 180, 270]))
     return img
 
 def predict_patient_folder(patient_path):
@@ -54,7 +56,7 @@ def predict_patient_folder(patient_path):
 
     for path in model_paths:
         model = DenseNet121(spatial_dims=3, in_channels=4, out_channels=2).to(device)
-        model.load_state_dict(torch.load(path, map_location=device))
+        model.load_state_dict(torch.load('best_model_fold1.pth', map_location=device))
         model.eval()
         with torch.no_grad():
             fold_probs = []
