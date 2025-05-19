@@ -18,4 +18,6 @@ export const reportApi = {
     });
   },
   getResults: () => api.get<Report[]>('/results'),
+  updateStatus: (reportId: number, status: string) => 
+    api.put<Report>(`/results/${reportId}/status`, { status }),
 }; 

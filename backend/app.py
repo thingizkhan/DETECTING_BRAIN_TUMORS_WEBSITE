@@ -240,6 +240,29 @@ def delete_report(report_id):
     
     return jsonify({'message': 'Report deleted successfully'}), 200
 
+@app.route('/results/<int:report_id>/status', methods=['PUT'])
+@jwt_required()
+def update_report_status(report_id):
+    user_id = get_jwt_identity()
+    report = Report.query.filter_by(id=report_id, user_id=user_id).first()
+    
+    if not report:
+        return jsonify({'error': 'Report not found or not authorized'}), 404
+    
+    data = request.get_json()
+    if 'status' not in data:
+        return jsonify({'error': 'Status is required'}), 400
+    
+    report.result = data['status']
+    db.session.commit()
+    
+    return jsonify({
+        'id': report.id,
+        'filename': report.filename,
+        'result': report.result,
+        'timestamp': report.timestamp.isoformat()
+    }), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
