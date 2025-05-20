@@ -48,7 +48,8 @@ def augment(img):
     return img
 
 def predict_patient_folder(patient_path):
-    model_paths = [f'backend/best_model_fold{i}.pth' for i in range(1, 6)]
+    # Corrected model paths to be relative to the script's location (backend directory)
+    model_paths = [f'best_model_fold{i}.pth' for i in range(1, 6)]
     img = load_multimodal_tensor(patient_path).to(device)
 
     votes = []
@@ -56,7 +57,7 @@ def predict_patient_folder(patient_path):
 
     for path in model_paths:
         model = DenseNet121(spatial_dims=3, in_channels=4, out_channels=2).to(device)
-        model.load_state_dict(torch.load('best_model_fold1.pth', map_location=device))
+        model.load_state_dict(torch.load(path, map_location=device))
         model.eval()
         with torch.no_grad():
             fold_probs = []
