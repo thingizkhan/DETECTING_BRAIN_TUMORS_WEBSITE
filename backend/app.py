@@ -215,7 +215,7 @@ def upload_file():
 
     # Veritabanına yaz
     user_id = get_jwt_identity()
-    result_str = f"Tespit Edilen: {'MGMT Mevcut' if label == 1 else 'MGMT Yok'} (Güven: {probability:.4f})"
+    result_str = f"Detected: {'MGMT Present' if label == 1 else 'MGMT Absent'} (Confidence: {probability:.4f})"
     report = Report(user_id=user_id, filename=filename, result=result_str)
     db.session.add(report)
     db.session.commit()
