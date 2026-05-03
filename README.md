@@ -100,9 +100,7 @@ brain_tumor_mgmt/
 ## 👨‍💻 Author
 
 Deniz Arda YILDIZ  
-Email: [your.email@example.com]  
-GitHub: [github.com/your-username]  
-LinkedIn: [linkedin.com/in/your-profile]
+
 
 ---
 
