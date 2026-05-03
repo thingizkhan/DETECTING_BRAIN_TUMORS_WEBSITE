@@ -1,109 +1,304 @@
-# 🧠 Brain Tumor & MGMT Methylation Detection Using 3D CNN
+# 🧠 Brain Tumor & MGMT Methylation Classification Web App
 
-This project focuses on the classification of brain tumors and prediction of MGMT promoter methylation status using 3D Convolutional Neural Networks (3D CNNs) on MRI data. The goal is to support non-invasive radiogenomic diagnosis in clinical settings.
-
----
-
-## 📁 Dataset
-
-The dataset used is the **RSNA-MICCAI Brain Tumor Radiogenomic Classification** dataset, which contains multimodal MRI scans labeled with MGMT promoter methylation status.
-
-### Modalities:
-- T1-weighted (T1w)
-- Contrast-enhanced T1 (T1wCE)
-- T2-weighted (T2w)
-- Fluid-attenuated inversion recovery (FLAIR)
-
-### Labels:
-- `MGMT_promoter_status`: 
-  - 0 = Unmethylated  
-  - 1 = Methylated
+Full-stack medical AI web application for MRI-based MGMT methylation prediction using multimodal brain MRI scans, a MONAI/PyTorch 3D DenseNet model, Flask backend API, and React TypeScript frontend.
 
 ---
 
-## 🧪 Preprocessing
+## 📌 Overview
 
-- Skull stripping and NIfTI volume conversion
-- Normalization of image intensities
-- Resizing to consistent shape (e.g., 64×256×256)
-- Stacking all four modalities per subject
-- Data augmentation with flipping and noise
+This project combines a deep learning MRI classification pipeline with a web-based interface. Users can register, log in, upload patient MRI data, and receive MGMT methylation prediction results.
+
+The backend handles preprocessing and model inference, while the frontend provides a user-friendly interface for interaction.
 
 ---
 
-## 🧠 Model
+## 🧠 AI Pipeline
 
-Built a custom 3D CNN architecture using MONAI & PyTorch to process multi-channel 3D MRI volumes.
-
-- Input shape: `(4, 64, 256, 256)` → 4 modalities, 64 slices
-- Used BatchNorm3D, ReLU, Dropout, and MaxPooling layers
-- Output: binary softmax classification for MGMT status
-
----
-
-## ⚙️ Training Setup
-
-- 5-fold cross-validation
-- Batch size: 1 (due to 3D volume size)
-- Optimizer: Adam
-- Loss: CrossEntropyLoss
-- Hardware: Trained on Google Cloud with NVIDIA L4 GPU
-
----
-
-## 📊 Evaluation Metrics
-
-- **Validation Accuracy**: ~85–90% per fold
-- **Confusion Matrix**, **Precision**, **Recall**, **F1-score**
-- Majority voting and test-time augmentation for final prediction
+```text
+Patient MRI Folder
+        ↓
+FLAIR / T1w / T1wCE / T2w DICOM Series
+        ↓
+Slice Selection + Preprocessing
+        ↓
+Tensor: (1, 4, 64, 256, 256)
+        ↓
+3D DenseNet121 (MONAI / PyTorch)
+        ↓
+5-Fold Ensemble + TTA
+        ↓
+MGMT Prediction
+        ↓
+API Response
+```
 
 ---
 
-## ▶️ Usage
+## ⚙️ Features
+
+- User authentication
+- JWT-based authorization
+- MRI upload system
+- Multimodal MRI processing
+- MONAI / PyTorch inference
+- 5-fold ensemble prediction
+- Result storage and retrieval
+- React TypeScript frontend
+- Flask REST API backend
+
+---
+
+## 🧬 MRI Modalities
+
+The system expects four modality folders:
+
+```text
+FLAIR/
+T1w/
+T1wCE/
+T2w/
+```
+
+Each folder should contain DICOM slices.
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+
+- Python
+- Flask
+- Flask-JWT-Extended
+- Flask-SQLAlchemy
+- Flask-CORS
+- PyTorch
+- MONAI
+- pydicom
+- OpenCV
+- NumPy
+- SQLite
+
+### Frontend
+
+- React
+- TypeScript
+- Material UI
+- Axios
+- React Router
+- Formik
+- Yup
+- React Toastify
+
+---
+
+## 📂 Project Structure
+
+```text
+.
+├── backend/
+│   ├── app.py
+│   ├── model_utils.py
+│   ├── train.py
+│   ├── requirements.txt
+│   ├── API_DOCUMENTATION.md
+│   ├── postman_collection.json
+│   └── Capstone_Project_Presentation.pdf
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   ├── package-lock.json
+│   └── tsconfig.json
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🚀 Installation & Usage
+
+### Backend Setup
 
 ```bash
-# Clone the repo and install dependencies
-pip install monai nibabel torch torchvision
+cd backend
+python -m venv venv
+```
 
-# Run preprocessing and training
-python train.py
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+macOS / Linux:
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run backend:
+
+```bash
+python app.py
+```
+
+Backend URL:
+
+```text
+http://localhost:4000
 ```
 
 ---
 
-## 📂 Folder Structure
+### Frontend Setup
 
+```bash
+cd frontend
+npm install
+npm start
 ```
-brain_tumor_mgmt/
-├── data/
-│   └── subject folders with NIfTI files
-├── models/
-│   └── best_model_fold*.pt
-├── src/
-│   ├── train.py
-│   └── dataset.py
-├── utils/
-├── outputs/
-├── README.md
+
+Frontend URL:
+
+```text
+http://localhost:3000
 ```
 
 ---
 
-## 📌 Key Contributions
+## 🔌 API Endpoints
 
-- Demonstrated application of 3D CNNs to real-world neuroimaging classification.
-- Proposed a radiogenomic-based solution for MGMT methylation detection.
-- Achieved competitive validation accuracy with explainable modeling.
+### Authentication
+
+```text
+POST /auth/register
+POST /auth/login
+GET  /auth/profile
+PUT  /auth/profile-update
+PUT  /auth/password
+```
+
+### Prediction / Results
+
+```text
+POST /upload
+GET  /results
+```
+
+Detailed API documentation:
+
+```text
+backend/API_DOCUMENTATION.md
+```
+
+Postman collection:
+
+```text
+backend/postman_collection.json
+```
 
 ---
 
-## 👨‍💻 Author
+## 📦 Model Files
 
-Deniz Arda YILDIZ  
+Trained model weights are not included in this repository because of file size limitations.
 
+Expected model files:
+
+```text
+backend/best_model_fold1.pth
+backend/best_model_fold2.pth
+backend/best_model_fold3.pth
+backend/best_model_fold4.pth
+backend/best_model_fold5.pth
+```
+
+Model paths can be changed in:
+
+```text
+backend/model_utils.py
+```
 
 ---
 
-## 📝 License
+## 📊 Dataset
 
-This project is open-source and available under the MIT License.
+This project was developed using the RSNA-MICCAI Brain Tumor Radiogenomic Classification dataset.
+
+The system predicts MGMT promoter methylation status:
+
+```text
+0 = Unmethylated
+1 = Methylated
+```
+
+Dataset files are not included because of size and medical data constraints.
+
+---
+
+## 🧪 Model Details
+
+The inference pipeline uses:
+
+- MONAI DenseNet121
+- 3D convolutional processing
+- 4 MRI input channels
+- 64 slices per modality
+- Input tensor shape: `(1, 4, 64, 256, 256)`
+- Softmax output for binary classification
+- 5-fold model ensemble
+- Test-time augmentation
+
+---
+
+## 🔐 Security Notes
+
+- Passwords are hashed
+- JWT tokens are used for protected routes
+- Uploaded files are stored locally
+- SQLite is used for local development
+- This project is intended for educational and research purposes only
+
+---
+
+## ⚠️ Limitations
+
+- Model weights are not included
+- Dataset is not included
+- The application is not medically validated
+- Current implementation is for demonstration and research purposes only
+
+---
+
+## 📈 Future Improvements
+
+- Clean backend folder structure
+- Move model files to external storage
+- Add Docker support
+- Add deployment configuration
+- Improve frontend upload flow
+- Add Grad-CAM or visual explainability
+- Add model performance dashboard
+- Support cloud storage for MRI uploads
+
+---
+
+## 👨‍💻 Authors
+
+Deniz Arda Yildiz  
+Project collaborator: thingizkhan
+
+---
+
+## ⭐ Notes
+
+This project demonstrates an end-to-end medical AI system combining MRI preprocessing, deep learning inference, backend API development, and frontend integration.
