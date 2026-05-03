@@ -295,7 +295,7 @@ The inference pipeline uses:
 ## 👨‍💻 Authors
 
 Deniz Arda Yildiz  
-Project collaborator: thingizkhan
+Mehmet Cengizhan KINAY
 
 ---
 
